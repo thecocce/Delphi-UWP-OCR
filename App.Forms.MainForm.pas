@@ -115,23 +115,28 @@ begin
 
   EnableControls([btnRecognize, panelLoadButtons], False);
 
-  oRandStream := GetRandomAccessStreamFromBitmap(g_srcPic.Graphic);
-  oOcrResult := RecognizeImage(oRandStream, cbLangs.Items[cbLangs.ItemIndex]);
+  try
+    oRandStream := GetRandomAccessStreamFromBitmap(g_srcPic.Graphic);
+    oOcrResult := RecognizeImage(oRandStream, cbLangs.Items[cbLangs.ItemIndex]);
 
-  if oOcrResult <> nil then
-  begin
-    g_nOcrImageAngle := 0;
-    g_nOcrImageAngle := oOcrResult.get_TextAngle.Value;
+    if oOcrResult <> nil then
+    begin
+      g_nOcrImageAngle := 0;
 
-    lblTextAngle.Caption := Format('%f', [g_nOcrImageAngle]);
+      g_nOcrImageAngle := 0;
+      if assigned(oOcrResult.get_TextAngle) then
+        g_nOcrImageAngle := oOcrResult.get_TextAngle.Value;
 
-    g_DataManager.InitWithResult(oOcrResult);
-    g_DataManager.DisplayData();
-    DrawWordsRects(nil);
-    PaintBox1.Invalidate();
+      lblTextAngle.Caption := Format('%f', [g_nOcrImageAngle]);
+
+      g_DataManager.InitWithResult(oOcrResult);
+      g_DataManager.DisplayData();
+      DrawWordsRects(nil);
+      PaintBox1.Invalidate();
+    end;
+  finally
+    EnableControls([btnRecognize, panelLoadButtons]);
   end;
-
-  EnableControls([btnRecognize, panelLoadButtons]);
 end;
 
 procedure TMainForm.btnLoadFromClipbrdClick(Sender: TObject);
